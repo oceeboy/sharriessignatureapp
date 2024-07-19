@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { icons } from "../constants";
 import { useNavigation } from "@react-navigation/native";
 import { BankCard, CustomButton, FormField } from "../components";
+import { AppContext } from "../context/ProductContext";
 const PaymentPage = () => {
+  const { moveToOrderedItems } = useContext(AppContext);
   const [form, setForm] = useState({
     cardnumber: "",
     cardname: "",
@@ -25,6 +27,7 @@ const PaymentPage = () => {
   };
 
   const submit = () => {
+    moveToOrderedItems();
     navigation.navigate("Ordersucces");
   };
 

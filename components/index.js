@@ -8,13 +8,16 @@ import CollectionCard from "./CollectionCard";
 import CustomButton from "./CustomButton";
 import EmptyCart from "./EmptyCart";
 import FormField from "./FormField";
+import OrderDetail from "./OrderDetail";
+import Orderitem from "./Orderitem";
 import ProductCard from "./ProductCard";
 import RecentlyViewedItem from "./RecentlyViewedItem";
 import SkeletonLoader from "./SkeletonLoader";
 import SliderItems from "./SliderItems";
 import TabIcon from "./TabIcon";
-
 export {
+  OrderDetail,
+  Orderitem,
   AddToCartBox,
   BankCard,
   CartCard,

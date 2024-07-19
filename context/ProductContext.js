@@ -6,12 +6,15 @@ export const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
+  const [orderedItems, setOrderedItems] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [recentlyViewedItems, setRecentlyViewedItems] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
     loadCart();
     loadWishlist();
+    loadOrderedItems();
   }, []);
 
   useEffect(() => {
@@ -21,6 +24,10 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     saveWishlist();
   }, [wishlist]);
+
+  useEffect(() => {
+    saveOrderedItems();
+  }, [orderedItems]);
 
   const saveCart = async () => {
     try {
@@ -53,6 +60,23 @@ export const AppProvider = ({ children }) => {
       if (storedWishlist) setWishlist(JSON.parse(storedWishlist));
     } catch (error) {
       console.error("Error loading wishlist: ", error);
+    }
+  };
+
+  const saveOrderedItems = async () => {
+    try {
+      await AsyncStorage.setItem("orderedItems", JSON.stringify(orderedItems));
+    } catch (error) {
+      console.error("Error saving ordered items: ", error);
+    }
+  };
+
+  const loadOrderedItems = async () => {
+    try {
+      const storedOrderedItems = await AsyncStorage.getItem("orderedItems");
+      if (storedOrderedItems) setOrderedItems(JSON.parse(storedOrderedItems));
+    } catch (error) {
+      console.error("Error loading ordered items: ", error);
     }
   };
 
@@ -109,6 +133,11 @@ export const AppProvider = ({ children }) => {
     );
   };
 
+  const moveToOrderedItems = () => {
+    setOrderedItems((prevOrderedItems) => [...prevOrderedItems, ...cart]);
+    clearCart();
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -125,6 +154,10 @@ export const AppProvider = ({ children }) => {
         wishlist,
         addToWishlist,
         removeFromWishlist,
+        orderedItems,
+        moveToOrderedItems,
+        selectedOrder,
+        setSelectedOrder,
       }}
     >
       {children}
