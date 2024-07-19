@@ -20,6 +20,7 @@ import {
   CartIcon,
   ProductCard,
   CollectionCard,
+  SkeletonLoader,
 } from "../components";
 import { useAuth } from "../context/AuthContext";
 
@@ -63,9 +64,8 @@ const HomePage = () => {
   };
 
   const renderCategory = (categoryName) => {
-    // Ensure products is an array
     if (!Array.isArray(products)) {
-      return null;
+      return <SkeletonLoader />;
     }
 
     const filteredProducts = products.filter((item) =>
@@ -81,11 +81,7 @@ const HomePage = () => {
       <View style={styles.sectionContent}>
         <View style={styles.sectionContentContainer}>
           {isLoading ? (
-            <ActivityIndicator color="#408C2B" size="large" />
-          ) : error ? (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
+            <SkeletonLoader title={"map"} />
           ) : (
             <View style={styles.productGrid}>
               {filteredProducts.map((item) => (
@@ -97,6 +93,11 @@ const HomePage = () => {
                   onPress={() => nextPage(item)}
                 />
               ))}
+              {error && (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>{error}</Text>
+                </View>
+              )}
             </View>
           )}
         </View>
@@ -113,7 +114,7 @@ const HomePage = () => {
 
       <View style={styles.welcomeContainer}>
         <Text style={styles.welcomeText}>
-          Welcome,{" "}
+          Welcome,
           <Text style={{ textTransform: "capitalize" }}>{user?.name}</Text>
         </Text>
       </View>
@@ -144,13 +145,14 @@ const HomePage = () => {
 
         <View style={styles.sliderContainer}>
           {isLoading ? (
-            <ActivityIndicator color="#408C2B" size="large" />
-          ) : error ? (
+            <SkeletonLoader title={"slider"} />
+          ) : (
+            <SliderItems data={products} onPress={nextPage} />
+          )}
+          {error && (
             <View style={styles.errorContainer}>
               <Text style={styles.errorText}>{error}</Text>
             </View>
-          ) : (
-            <SliderItems data={products} onPress={nextPage} />
           )}
         </View>
         <View style={styles.sectionContainer}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ const SliderItems = ({ data, onPress }) => {
   const handleScroll = (direction) => {
     if (flatListRef.current) {
       flatListRef.current.scrollToOffset({
-        offset: direction === "next" ? 200 : 0, // Adjust offset as needed
+        offset: direction === "next" ? 200 : 0,
         animated: true,
       });
     }
@@ -65,8 +65,8 @@ const SliderItems = ({ data, onPress }) => {
         keyExtractor={(item) => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
-        ListHeaderComponent={<View style={{ width: 32 }} />} // Add space at the start
-        ListFooterComponent={<View style={{ width: 10 }} />} // Add space at the end
+        ListHeaderComponent={<View style={{ width: 32 }} />}
+        ListFooterComponent={<View style={{ width: 10 }} />}
       />
     </>
   );

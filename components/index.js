@@ -10,6 +10,7 @@ import EmptyCart from "./EmptyCart";
 import FormField from "./FormField";
 import ProductCard from "./ProductCard";
 import RecentlyViewedItem from "./RecentlyViewedItem";
+import SkeletonLoader from "./SkeletonLoader";
 import SliderItems from "./SliderItems";
 import TabIcon from "./TabIcon";
 
@@ -28,4 +29,5 @@ export {
   FormField,
   CustomButton,
   CardText,
+  SkeletonLoader,
 };
