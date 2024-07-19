@@ -12,7 +12,7 @@ import { ProductCard } from "../components";
 import { AppContext } from "../context/ProductContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const WishListPage = ({ navigation }) => {
+const WishListPage = () => {
   const { wishlist, removeFromWishlist } = useContext(AppContext);
 
   const handleRemoveFromWishlist = (productId) => {

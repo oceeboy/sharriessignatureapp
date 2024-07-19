@@ -1,12 +1,60 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [recentlyViewedItems, setRecentlyViewedItems] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
+
+  useEffect(() => {
+    loadCart();
+    loadWishlist();
+  }, []);
+
+  useEffect(() => {
+    saveCart();
+  }, [cart]);
+
+  useEffect(() => {
+    saveWishlist();
+  }, [wishlist]);
+
+  const saveCart = async () => {
+    try {
+      await AsyncStorage.setItem("cart", JSON.stringify(cart));
+    } catch (error) {
+      console.error("Error saving cart: ", error);
+    }
+  };
+
+  const loadCart = async () => {
+    try {
+      const storedCart = await AsyncStorage.getItem("cart");
+      if (storedCart) setCart(JSON.parse(storedCart));
+    } catch (error) {
+      console.error("Error loading cart: ", error);
+    }
+  };
+
+  const saveWishlist = async () => {
+    try {
+      await AsyncStorage.setItem("wishlist", JSON.stringify(wishlist));
+    } catch (error) {
+      console.error("Error saving wishlist: ", error);
+    }
+  };
+
+  const loadWishlist = async () => {
+    try {
+      const storedWishlist = await AsyncStorage.getItem("wishlist");
+      if (storedWishlist) setWishlist(JSON.parse(storedWishlist));
+    } catch (error) {
+      console.error("Error loading wishlist: ", error);
+    }
+  };
 
   const addToCart = (product, quantity = 1) => {
     setCart((prevCart) => {
@@ -51,25 +99,14 @@ export const AppProvider = ({ children }) => {
     return cart.reduce((count, item) => count + item.quantity, 0);
   };
 
-  // Wishlist functions
   const addToWishlist = (product) => {
-    setWishlist((prevWishlist) => {
-      if (prevWishlist.find((item) => item.id === product.id)) {
-        return prevWishlist;
-      } else {
-        return [...prevWishlist, product];
-      }
-    });
+    setWishlist((prevWishlist) => [...prevWishlist, product]);
   };
 
   const removeFromWishlist = (productId) => {
     setWishlist((prevWishlist) =>
       prevWishlist.filter((item) => item.id !== productId)
     );
-  };
-
-  const clearWishlist = () => {
-    setWishlist([]);
   };
 
   return (
@@ -88,7 +125,6 @@ export const AppProvider = ({ children }) => {
         wishlist,
         addToWishlist,
         removeFromWishlist,
-        clearWishlist,
       }}
     >
       {children}
