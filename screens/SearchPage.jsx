@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Button,
@@ -14,8 +14,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { getImageUrl, getProducts } from "../services/apiService";
 
 import ProductCard from "../components/ProductCard";
+import { AppContext } from "../context/ProductContext";
+import { useNavigation } from "@react-navigation/native";
 
 const SearchPage = () => {
+  const { setSelectedProduct } = useContext(AppContext);
   const [products, setProducts] = useState([]);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -47,6 +50,14 @@ const SearchPage = () => {
       );
       setResults(filteredResults);
     }
+  };
+
+  const navigation = useNavigation();
+
+  const nextPage = (product) => {
+    setSelectedProduct(product);
+
+    navigation.navigate("ProductDetail");
   };
 
   return (
@@ -95,6 +106,7 @@ const SearchPage = () => {
               price={item.current_price[0].NGN[0]}
               image={getImageUrl(item.photos[0].url)}
               onPress={() => nextPage(item)}
+              productId={item.unique_id}
             />
           ))}
         </View>

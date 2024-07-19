@@ -19,6 +19,8 @@ import facebook from "../assets/icons/facebook.png";
 import visaicon from "../assets/icons/visaicon.png";
 import chip from "../assets/icons/chip.png";
 import success from "../assets/icons/success.png";
+import wishuncheck from "../assets/icons/wishuncheck.png";
+import wishchecked from "../assets/icons/wishchecked.png";
 
 export default {
   home,
@@ -42,4 +44,6 @@ export default {
   visaicon,
   chip,
   success,
+  wishuncheck,
+  wishchecked,
 };

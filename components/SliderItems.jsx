@@ -60,9 +60,10 @@ const SliderItems = ({ data, onPress }) => {
             price={item.current_price[0].NGN[0]}
             image={getImageUrl(item.photos[0].url)}
             onPress={() => onPress(item)}
+            productId={item.unique_id}
           />
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.unique_id}
         horizontal
         showsHorizontalScrollIndicator={false}
         ListHeaderComponent={<View style={{ width: 32 }} />}

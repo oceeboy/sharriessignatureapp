@@ -4,9 +4,10 @@ import { AppContext } from "../context/ProductContext";
 import { getImageUrl } from "../services/apiService";
 import { useNavigation } from "@react-navigation/native";
 import ProductCard from "./ProductCard";
+import SkeletonLoader from "./SkeletonLoader";
 
 const RecentlyViewedItem = () => {
-  const { recentlyViewedItems = [] } = useContext(AppContext);
+  const { recentlyViewedItems } = useContext(AppContext);
   const navigation = useNavigation();
 
   const handleProductSelect = () => {
@@ -14,7 +15,7 @@ const RecentlyViewedItem = () => {
   };
 
   if (recentlyViewedItems.length === 0) {
-    return <Text style={styles.noItemsText}>No recently viewed items</Text>;
+    return <SkeletonLoader title={"map"} />;
   }
 
   return (
@@ -28,6 +29,7 @@ const RecentlyViewedItem = () => {
               price={item.current_price[0].NGN[0]}
               title={item.name}
               onPress={handleProductSelect}
+              productId={item.unique_id}
             />
           ))}
         </View>

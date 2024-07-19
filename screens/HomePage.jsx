@@ -91,6 +91,7 @@ const HomePage = () => {
                   price={item.current_price[0].NGN[0]}
                   image={getImageUrl(item.photos[0].url)}
                   onPress={() => nextPage(item)}
+                  productId={item.unique_id}
                 />
               ))}
               {error && (
