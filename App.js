@@ -13,6 +13,11 @@ import ProductDetailPage from "./screens/ProductDetailPage";
 import CheckOutPage from "./screens/CheckOutPage";
 import { FontProvider } from "./context/FontProvider";
 import { AppProvider } from "./context/ProductContext";
+import { LoginPage, RegisterPage, WelcomePage } from "./screens";
+import PaymentPage from "./screens/PaymentPage";
+import OrderSucess from "./screens/OrderSucess";
+import OrderHistoryPage from "./screens/OrderHistoryPage";
+import { AuthProvider } from "./context/AuthContext";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,7 +25,7 @@ const Tab = createBottomTabNavigator();
 
 function MainNavigator() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName="Welcome">
       <Stack.Screen
         name="Main"
         component={BottomTabNavigator}
@@ -34,6 +39,36 @@ function MainNavigator() {
       <Stack.Screen
         name="CheckOut"
         component={CheckOutPage}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Welcome"
+        component={WelcomePage}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Register"
+        component={RegisterPage}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Login"
+        component={LoginPage}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Paymentpage"
+        component={PaymentPage}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Ordersucces"
+        component={OrderSucess}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="historypage"
+        component={OrderHistoryPage}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
@@ -114,12 +149,14 @@ function BottomTabNavigator() {
 
 export default function App() {
   return (
-    <FontProvider>
-      <AppProvider>
-        <NavigationContainer>
-          <MainNavigator />
-        </NavigationContainer>
-      </AppProvider>
-    </FontProvider>
+    <AuthProvider>
+      <FontProvider>
+        <AppProvider>
+          <NavigationContainer>
+            <MainNavigator />
+          </NavigationContainer>
+        </AppProvider>
+      </FontProvider>
+    </AuthProvider>
   );
 }

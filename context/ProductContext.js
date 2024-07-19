@@ -6,6 +6,7 @@ export const AppProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [recentlyViewedItems, setRecentlyViewedItems] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
 
   const addToCart = (product, quantity = 1) => {
     setCart((prevCart) => {
@@ -50,6 +51,27 @@ export const AppProvider = ({ children }) => {
     return cart.reduce((count, item) => count + item.quantity, 0);
   };
 
+  // Wishlist functions
+  const addToWishlist = (product) => {
+    setWishlist((prevWishlist) => {
+      if (prevWishlist.find((item) => item.id === product.id)) {
+        return prevWishlist;
+      } else {
+        return [...prevWishlist, product];
+      }
+    });
+  };
+
+  const removeFromWishlist = (productId) => {
+    setWishlist((prevWishlist) =>
+      prevWishlist.filter((item) => item.id !== productId)
+    );
+  };
+
+  const clearWishlist = () => {
+    setWishlist([]);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -63,6 +85,10 @@ export const AppProvider = ({ children }) => {
         setSelectedProduct,
         recentlyViewedItems,
         setRecentlyViewedItems,
+        wishlist,
+        addToWishlist,
+        removeFromWishlist,
+        clearWishlist,
       }}
     >
       {children}

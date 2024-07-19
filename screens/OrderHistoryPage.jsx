@@ -2,16 +2,16 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const WishListPage = () => {
+const OrderHistoryPage = () => {
   return (
     <SafeAreaView>
       <View>
-        <Text>WishListPage</Text>
+        <Text>OrderHistoryPage</Text>
       </View>
     </SafeAreaView>
   );
 };
 
-export default WishListPage;
+export default OrderHistoryPage;
 
 const styles = StyleSheet.create({});

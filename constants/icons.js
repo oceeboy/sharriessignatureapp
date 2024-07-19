@@ -12,6 +12,13 @@ import minus from "../assets/icons/minus.png";
 import plus from "../assets/icons/Plus.png";
 import cartcover from "../assets/icons/cartcover.png";
 import trash from "../assets/icons/trash.png";
+import eye from "../assets/icons/eye.png";
+import apple from "../assets/icons/apple.png";
+import google from "../assets/icons/google.png";
+import facebook from "../assets/icons/facebook.png";
+import visaicon from "../assets/icons/visaicon.png";
+import chip from "../assets/icons/chip.png";
+import success from "../assets/icons/success.png";
 
 export default {
   home,
@@ -28,4 +35,11 @@ export default {
   minus,
   cartcover,
   trash,
+  eye,
+  apple,
+  google,
+  facebook,
+  visaicon,
+  chip,
+  success,
 };

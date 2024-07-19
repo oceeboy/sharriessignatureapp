@@ -21,8 +21,7 @@ const CheckOutPage = () => {
   const totalPrice = useMemo(() => getTotalPrice(), [cart]);
 
   const handleCheckout = () => {
-    clearCart();
-    navigation.navigate("Main");
+    navigation.navigate("Paymentpage");
   };
   const viewAll = () => {
     navigation.navigate("Main");

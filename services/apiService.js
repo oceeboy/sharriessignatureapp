@@ -7,19 +7,21 @@ const organization_id = "54db846ca93b479a9cc67204674621ed";
 const Appid = "6BWP9Z2WUC29X6C";
 const Apikey = "2482205ddcff4363b4d7d5e8637f1c4920240705193638616942";
 
+const apiClient = axios.create({
+  baseURL: BASE_URL,
+  params: {
+    organization_id,
+    Appid,
+    Apikey,
+  },
+});
+
 export const getProducts = async () => {
   try {
-    const response = await axios.get(PRODUCTS_URL, {
-      params: {
-        organization_id,
-        Appid,
-        Apikey,
-      },
-    });
-
+    const response = await apiClient.get(PRODUCTS_URL);
     return response.data.items;
   } catch (error) {
-    throw error;
+    console.error(error);
   }
 };
 

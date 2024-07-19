@@ -11,15 +11,17 @@ import {
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import icons from "../constants/icons";
-import SliderItems from "../components/SliderItems";
 import { getImageUrl, getProducts } from "../services/apiService";
 import { useNavigation } from "@react-navigation/native";
 import { AppContext } from "../context/ProductContext";
-import CartIcon from "../components/CartIcon";
-import ProductCard from "../components/ProductCard";
-import CollectionCard from "../components/CollectionCard";
-import { collectionData } from "../constants";
+import { collectionData, icons } from "../constants";
+import {
+  SliderItems,
+  CartIcon,
+  ProductCard,
+  CollectionCard,
+} from "../components";
+import { useAuth } from "../context/AuthContext";
 
 const HomePage = () => {
   const { setSelectedProduct } = useContext(AppContext);
@@ -27,6 +29,7 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const { user } = useAuth();
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -55,42 +58,49 @@ const HomePage = () => {
 
   const nextPage = (product) => {
     setSelectedProduct(product);
+
     navigation.navigate("ProductDetail");
   };
 
   const renderCategory = (categoryName) => {
+    // Ensure products is an array
+    if (!Array.isArray(products)) {
+      return null;
+    }
+
     const filteredProducts = products.filter((item) =>
-      item.categories.some(
-        (category) => category.name.toLowerCase() === categoryName.toLowerCase()
-      )
+      item.categories && Array.isArray(item.categories)
+        ? item.categories.some(
+            (category) =>
+              category.name.toLowerCase() === categoryName.toLowerCase()
+          )
+        : false
     );
 
     return (
-      <>
-        <View style={styles.sectionContent}>
-          <View style={styles.sectionContentContainer}>
-            {isLoading ? (
-              <ActivityIndicator color="#408C2B" size="large" />
-            ) : error ? (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-              </View>
-            ) : (
-              <View style={styles.productGrid}>
-                {filteredProducts.map((item) => (
-                  <ProductCard
-                    key={item.id}
-                    title={item.name}
-                    price={item.current_price[0].NGN[0]}
-                    image={getImageUrl(item.photos[0].url)}
-                    onPress={() => nextPage(item)}
-                  />
-                ))}
-              </View>
-            )}
-          </View>
+      <View style={styles.sectionContent}>
+        <View style={styles.sectionContentContainer}>
+          {isLoading ? (
+            <ActivityIndicator color="#408C2B" size="large" />
+          ) : error ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : (
+            <View style={styles.productGrid}>
+              {filteredProducts.map((item) => (
+                <ProductCard
+                  key={item.unique_id}
+                  title={item.name}
+                  price={item.current_price[0].NGN[0]}
+                  image={getImageUrl(item.photos[0].url)}
+                  onPress={() => nextPage(item)}
+                />
+              ))}
+            </View>
+          )}
         </View>
-      </>
+      </View>
     );
   };
 
@@ -102,7 +112,10 @@ const HomePage = () => {
       </View>
 
       <View style={styles.welcomeContainer}>
-        <Text style={styles.welcomeText}>Welcome, Jane</Text>
+        <Text style={styles.welcomeText}>
+          Welcome,{" "}
+          <Text style={{ textTransform: "capitalize" }}>{user?.name}</Text>
+        </Text>
       </View>
       <ScrollView
         contentContainerStyle={styles.scrollView}
@@ -244,7 +257,7 @@ const styles = StyleSheet.create({
   sliderContainer: {
     marginTop: 32,
   },
-  sectionContainer: { paddingHorizontal: 33, marginVertical: 45 },
+  sectionContainer: { paddingHorizontal: 20, marginVertical: 45 },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",

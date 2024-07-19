@@ -64,13 +64,23 @@ const ProductDetailPage = () => {
         <View style={styles.productContainer}>
           <View style={styles.imageGrid}>
             <View style={styles.imageContainerOne}>
-              <Image
+              {/* <Image
                 source={{
                   uri: getImageUrl(selectedProduct.photos[0].url),
                 }}
                 style={styles.image}
                 resizeMode="cover"
-              />
+              /> */}
+
+              {selectedProduct.photos.map((photos) => (
+                <View key={photos}>
+                  <Image
+                    source={{ uri: getImageUrl(photos.url) }}
+                    style={{ height: "100%", width: "100%" }}
+                    resizeMode="cover"
+                  />
+                </View>
+              ))}
             </View>
           </View>
           <View style={styles.productInfoContainer}>
