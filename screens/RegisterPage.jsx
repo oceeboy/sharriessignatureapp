@@ -1,11 +1,15 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View, Alert } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CustomButton, FormField } from "../components";
-import { useNavigation } from "@react-navigation/native";
-import { useAuth } from "../context/AuthContext";
+import { CommonActions, useNavigation } from "@react-navigation/native";
+import { useGlobalContext } from "../context/GlobalProvider";
+import { createUser } from "../lib/appwrite";
 
 const RegisterPage = () => {
+  const { setUser, setIsLogged, loading, isLogged } = useGlobalContext();
+  const navigation = useNavigation();
+  const [formError, setFormError] = useState("");
   const [isSubmitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -13,15 +17,31 @@ const RegisterPage = () => {
     password: "",
   });
 
-  const { register, error } = useAuth();
-  const navigation = useNavigation();
+  useEffect(() => {
+    if (!loading && isLogged) {
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "Main" }],
+        })
+      );
+    }
+  }, [loading, isLogged, navigation]);
 
   const submit = async () => {
+    if (form.name === "" || form.email === "" || form.password === "") {
+      setFormError("Please fill all fields.");
+    }
+
     setSubmitting(true);
     try {
-      await register(form.email, form.password, form.name);
+      const result = await createUser(form.email, form.password, form.name);
+      setUser(result);
+      setIsLogged(true);
+      setFormError("");
       navigation.navigate("Main");
-    } catch (err) {
+    } catch (error) {
+      Alert.alert("Error", error.message);
     } finally {
       setSubmitting(false);
     }
@@ -78,7 +98,8 @@ const RegisterPage = () => {
               borderradius={styles.borderradius}
             />
           </View>
-          {error && <Text style={styles.errorText}>{error}</Text>}
+          {formError ? <Text style={styles.errorText}>{formError}</Text> : null}
+
           <View style={styles.buttonContainer}>
             <CustomButton
               title="Sign Up"

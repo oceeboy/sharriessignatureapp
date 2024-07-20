@@ -1,19 +1,21 @@
 import React, { useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { account } from "../services/appwrite";
-import { useAuth } from "../context/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useGlobalContext } from "../context/GlobalProvider";
+import { signOut } from "../lib/appwrite";
 
 const ProfilePage = () => {
   const [isSubmitting, setSubmitting] = useState(false);
   const navigation = useNavigation();
 
-  const { logout, user } = useAuth();
+  const { user, setUser, setIsLogged } = useGlobalContext();
 
   const handleLogout = async () => {
     try {
-      await logout();
+      await signOut();
+      setUser(null);
+      setIsLogged(false);
       setSubmitting(true);
       setTimeout(() => {
         navigation.navigate("Login");
@@ -34,8 +36,10 @@ const ProfilePage = () => {
       </View>
       <View style={styles.bodyContainer}>
         <View style={styles.bodyContent}>
-          <Text style={styles.bodyText}>Name: {user.name}</Text>
-          <Text style={styles.bodyText}>Email: {user.email}</Text>
+          <Text style={styles.bodyText}>Name: {user ? user.name : "null"}</Text>
+          <Text style={styles.bodyText}>
+            Email: {user ? user.email : "null"}
+          </Text>
           <TouchableOpacity onPress={myOrders}>
             <Text style={styles.bodyText}>My Orders</Text>
           </TouchableOpacity>

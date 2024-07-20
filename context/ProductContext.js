@@ -1,18 +1,18 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { databases, Query, ID } from "../services/appwrite";
-import { AuthContext } from "./AuthContext";
+import { useGlobalContext } from "./GlobalProvider";
 
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  const { user } = useContext(AuthContext);
+  const { user } = useGlobalContext();
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [orderedItems, setOrderedItems] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [recentlyViewedItems, setRecentlyViewedItems] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [errors, setErrors] = useState([]);
 
   useEffect(() => {
     if (user) {
@@ -34,11 +34,19 @@ export const AppProvider = ({ children }) => {
     saveOrderedItems();
   }, [orderedItems]);
 
+  const handleError = (error) => {
+    console.error(error);
+    setErrors((prevErrors) => [
+      ...prevErrors,
+      error.message || "An error occurred",
+    ]);
+  };
+
   const saveCart = async () => {
     try {
       await AsyncStorage.setItem("cart", JSON.stringify(cart));
     } catch (error) {
-      console.error("Error saving cart: ", error);
+      handleError(error);
     }
   };
 
@@ -47,7 +55,7 @@ export const AppProvider = ({ children }) => {
       const storedCart = await AsyncStorage.getItem("cart");
       if (storedCart) setCart(JSON.parse(storedCart));
     } catch (error) {
-      console.error("Error loading cart: ", error);
+      handleError(error);
     }
   };
 
@@ -55,7 +63,7 @@ export const AppProvider = ({ children }) => {
     try {
       await AsyncStorage.setItem("wishlist", JSON.stringify(wishlist));
     } catch (error) {
-      console.error("Error saving wishlist: ", error);
+      handleError(error);
     }
   };
 
@@ -64,7 +72,7 @@ export const AppProvider = ({ children }) => {
       const storedWishlist = await AsyncStorage.getItem("wishlist");
       if (storedWishlist) setWishlist(JSON.parse(storedWishlist));
     } catch (error) {
-      console.error("Error loading wishlist: ", error);
+      handleError(error);
     }
   };
 
@@ -72,7 +80,7 @@ export const AppProvider = ({ children }) => {
     try {
       await AsyncStorage.setItem("orderedItems", JSON.stringify(orderedItems));
     } catch (error) {
-      console.error("Error saving ordered items: ", error);
+      handleError(error);
     }
   };
 
@@ -81,7 +89,7 @@ export const AppProvider = ({ children }) => {
       const storedOrderedItems = await AsyncStorage.getItem("orderedItems");
       if (storedOrderedItems) setOrderedItems(JSON.parse(storedOrderedItems));
     } catch (error) {
-      console.error("Error loading ordered items: ", error);
+      handleError(error);
     }
   };
 
@@ -138,62 +146,6 @@ export const AppProvider = ({ children }) => {
     );
   };
 
-  const moveToOrderedItems = async () => {
-    try {
-      const newOrderedItems = cart.map((item) => ({
-        id: item.unique_id.toString(),
-        name: item.name,
-        quantity: item.quantity.toString(),
-        price: item.current_price[0].NGN[0].toString(),
-        total: item.total.toString(),
-        image: item.photos[0].url,
-      }));
-
-      const payload = {
-        orderedItems: newOrderedItems.map((item) => JSON.stringify(item)),
-        orderDate: new Date().toISOString(),
-        userEmail: user.email,
-      };
-
-      console.log("Payload to be sent to Appwrite: ", payload); // Debugging line
-
-      const response = await databases.createDocument(
-        "6697fa22000e622ffd44",
-        "669aa8de002164e362ce",
-        ID.unique(),
-        payload
-      );
-      console.log("Ordered items saved to Appwrite: ", response);
-
-      setOrderedItems((prevOrderedItems) => [...prevOrderedItems, ...cart]);
-      clearCart();
-    } catch (error) {
-      console.error("Error saving ordered items to Appwrite: ", error);
-    }
-  };
-
-  const fetchOrderedItems = async () => {
-    if (!user) return;
-
-    try {
-      const response = await databases.listDocuments(
-        "6697fa22000e622ffd44",
-        "669aa8de002164e362ce",
-        [Query.equal("userEmail", user.email)]
-      );
-      console.log(response);
-      const fetchedOrderedItems = response.documents.map((doc) => ({
-        ...doc,
-        orderedItems: doc.orderedItems.map((item) => JSON.parse(item)),
-      }));
-
-      setOrderedItems(fetchedOrderedItems);
-      console.log("Fetched ordered items: ", fetchedOrderedItems);
-    } catch (error) {
-      console.error("Error fetching ordered items from Appwrite: ", error);
-    }
-  };
-
   return (
     <AppContext.Provider
       value={{
@@ -211,13 +163,15 @@ export const AppProvider = ({ children }) => {
         addToWishlist,
         removeFromWishlist,
         orderedItems,
-        moveToOrderedItems,
+        setOrderedItems,
         selectedOrder,
         setSelectedOrder,
-        fetchOrderedItems,
+        errors,
       }}
     >
       {children}
     </AppContext.Provider>
   );
 };
+
+export const useAppContext = () => useContext(AppContext);

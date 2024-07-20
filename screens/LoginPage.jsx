@@ -1,31 +1,58 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CustomButton, FormField } from "../components";
-import { useNavigation } from "@react-navigation/native";
-import { useAuth } from "../context/AuthContext";
+import { CommonActions, useNavigation } from "@react-navigation/native";
+import { getCurrentUser, signIn } from "../lib/appwrite";
+import { useGlobalContext } from "../context/GlobalProvider";
 
 const LoginPage = () => {
+  const navigation = useNavigation();
+
   const [isSubmitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
-  const navigation = useNavigation();
-  const { login, user, error } = useAuth();
+
+  const { loading, isLogged, setIsLogged, setUser } = useGlobalContext();
 
   useEffect(() => {
-    if (user) {
-      navigation.navigate("Main");
+    if (!loading && isLogged) {
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "Main" }],
+        })
+      );
     }
-  }, [user]);
-
+  }, [loading, isLogged, navigation]);
   const submit = async () => {
+    if (form.email === "" || form.password === "") {
+      Alert.alert("Error", "Please fill in all fields");
+    }
+
     setSubmitting(true);
+
     try {
-      await login(form.email, form.password);
+      await signIn(form.email, form.password);
+      const result = await getCurrentUser();
+      setUser(result);
+      setIsLogged(true);
+
+      Alert.alert("Success", "User signed in successfully");
+      navigation.navigate("Main");
     } catch (error) {
+      Alert.alert("Error", error.message);
     } finally {
       setSubmitting(false);
     }
   };
+
   const nextPage = () => {
     navigation.navigate("Register");
   };
@@ -64,7 +91,7 @@ const LoginPage = () => {
               secureTextEntry
             />
           </View>
-          {error && <Text style={styles.errorText}>{error}</Text>}
+
           <View style={styles.forgotPasswordContainer}>
             <TouchableOpacity>
               <Text style={styles.forgotPassword}>Forgot Password?</Text>

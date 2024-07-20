@@ -11,15 +11,23 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { icons } from "../constants";
 import { useNavigation } from "@react-navigation/native";
 import { BankCard, CustomButton, FormField } from "../components";
+
+import { moveToOrderedItems } from "../lib/appwrite";
 import { AppContext } from "../context/ProductContext";
+import { useGlobalContext } from "../context/GlobalProvider";
+
 const PaymentPage = () => {
-  const { moveToOrderedItems } = useContext(AppContext);
   const [form, setForm] = useState({
     cardnumber: "",
     cardname: "",
     cardexpire: "",
     cardcvv: "",
   });
+
+  const { user } = useGlobalContext();
+
+  const { cart, setOrderedItems, clearCart } = useContext(AppContext); // Use the context
+
   const format = (text) => text.replace(/(.{4})/g, "$1 ");
   const navigation = useNavigation();
   const goBack = () => {
@@ -27,9 +35,15 @@ const PaymentPage = () => {
   };
 
   const submit = async () => {
-    await moveToOrderedItems();
-    // You can add other logic here, such as navigating to an order confirmation screen
-    navigation.navigate("Ordersucces");
+    // Assuming `email` is available in context or passed from somewhere
+    const email = user.email; // You should replace this with actual user email
+
+    try {
+      await moveToOrderedItems(cart, setOrderedItems, clearCart, email);
+      navigation.navigate("Ordersucces"); // Ensure route name is correct
+    } catch (error) {
+      console.error("Error during order submission: ", error);
+    }
   };
 
   return (
@@ -165,12 +179,10 @@ const styles = StyleSheet.create({
   },
   cardnumber: {
     width: "100%",
-
     alignItems: "center",
   },
   cardname: {
     width: "100%",
-
     alignItems: "center",
   },
   borderradius: {

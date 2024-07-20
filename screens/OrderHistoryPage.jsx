@@ -2,7 +2,6 @@ import {
   FlatList,
   Image,
   Modal,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,13 +10,16 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AppContext } from "../context/ProductContext";
-import Orderitem from "../components/Orderitem"; // Import the Orderitem component
+import Orderitem from "../components/Orderitem";
 import { icons } from "../constants";
 import { OrderDetail } from "../components";
+import { fetchOrderedItems } from "../lib/appwrite"; // Adjust the import path as needed
+import { useGlobalContext } from "../context/GlobalProvider"; // Adjust the import path as needed
 
 const OrderHistoryPage = () => {
-  const { orderedItems, setSelectedOrder, fetchOrderedItems } =
-    useContext(AppContext);
+  const { setSelectedOrder } = useContext(AppContext);
+  const { user } = useGlobalContext(); // Get the user from the global context
+  const [orderedItems, setOrderedItems] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
   const handlePresentModal = (product) => {
@@ -26,8 +28,12 @@ const OrderHistoryPage = () => {
   };
 
   useEffect(() => {
-    fetchOrderedItems();
-  }, []);
+    const email = user.email;
+
+    if (user) {
+      fetchOrderedItems(setOrderedItems, user, email); // Fetch ordered items based on the user
+    }
+  }, [user]);
 
   return (
     <SafeAreaView style={styles.safeArea}>

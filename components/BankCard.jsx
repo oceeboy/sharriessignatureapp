@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-SemiBold",
     color: "#fff",
   },
-  // floating extras
+ 
   chipContainer: {
     width: 45,
     height: 35,

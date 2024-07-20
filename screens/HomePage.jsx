@@ -22,7 +22,8 @@ import {
   CollectionCard,
   SkeletonLoader,
 } from "../components";
-import { useAuth } from "../context/AuthContext";
+
+import { useGlobalContext } from "../context/GlobalProvider";
 
 const HomePage = () => {
   const { setSelectedProduct } = useContext(AppContext);
@@ -30,7 +31,8 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-  const { user } = useAuth();
+
+  const { user } = useGlobalContext();
 
   const onRefresh = () => {
     setRefreshing(true);
