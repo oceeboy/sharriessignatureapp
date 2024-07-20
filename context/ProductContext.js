@@ -1,10 +1,12 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { databases } from "../services/appwrite";
+import { databases, Query, ID } from "../services/appwrite";
+import { AuthContext } from "./AuthContext";
 
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
+  const { user } = useContext(AuthContext);
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [orderedItems, setOrderedItems] = useState([]);
@@ -13,10 +15,12 @@ export const AppProvider = ({ children }) => {
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
-    loadCart();
-    loadWishlist();
-    loadOrderedItems();
-  }, []);
+    if (user) {
+      loadCart();
+      loadWishlist();
+      loadOrderedItems();
+    }
+  }, [user]);
 
   useEffect(() => {
     saveCart();
@@ -137,7 +141,7 @@ export const AppProvider = ({ children }) => {
   const moveToOrderedItems = async () => {
     try {
       const newOrderedItems = cart.map((item) => ({
-        id: item.id.toString(),
+        id: item.unique_id.toString(),
         name: item.name,
         quantity: item.quantity.toString(),
         price: item.current_price[0].NGN[0].toString(),
@@ -148,14 +152,15 @@ export const AppProvider = ({ children }) => {
       const payload = {
         orderedItems: newOrderedItems.map((item) => JSON.stringify(item)),
         orderDate: new Date().toISOString(),
+        userEmail: user.email,
       };
 
       console.log("Payload to be sent to Appwrite: ", payload); // Debugging line
 
       const response = await databases.createDocument(
-        "6697fa22000e622ffd44", // Your database ID
-        "669aa8de002164e362ce", // Your collection ID
-        "unique()", // Use 'unique()' to generate a unique ID
+        "6697fa22000e622ffd44",
+        "669aa8de002164e362ce",
+        ID.unique(),
         payload
       );
       console.log("Ordered items saved to Appwrite: ", response);
@@ -166,13 +171,17 @@ export const AppProvider = ({ children }) => {
       console.error("Error saving ordered items to Appwrite: ", error);
     }
   };
+
   const fetchOrderedItems = async () => {
+    if (!user) return;
+
     try {
       const response = await databases.listDocuments(
-        "6697fa22000e622ffd44", // Your database ID
-        "669aa8de002164e362ce" // Your collection ID
+        "6697fa22000e622ffd44",
+        "669aa8de002164e362ce",
+        [Query.equal("userEmail", user.email)]
       );
-
+      console.log(response);
       const fetchedOrderedItems = response.documents.map((doc) => ({
         ...doc,
         orderedItems: doc.orderedItems.map((item) => JSON.parse(item)),

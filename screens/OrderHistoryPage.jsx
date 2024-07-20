@@ -48,18 +48,15 @@ const OrderHistoryPage = () => {
           <Text style={styles.noItemsText}>No items found</Text>
         </View>
       ) : (
-        <ScrollView
+        <FlatList
+          data={orderedItems}
+          keyExtractor={(item) => item.$id}
+          renderItem={({ item }) => (
+            <Orderitem item={item} onPress={() => handlePresentModal(item)} />
+          )}
           contentContainerStyle={styles.scrollArea}
           showsVerticalScrollIndicator={false}
-        >
-          {orderedItems.map((item) => (
-            <Orderitem
-              key={item.$id}
-              item={item}
-              onPress={() => handlePresentModal(item)}
-            />
-          ))}
-        </ScrollView>
+        />
       )}
 
       <Modal
