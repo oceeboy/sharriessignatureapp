@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { databases } from "../services/appwrite";
 
 export const AppContext = createContext();
 
@@ -133,9 +134,55 @@ export const AppProvider = ({ children }) => {
     );
   };
 
-  const moveToOrderedItems = () => {
-    setOrderedItems((prevOrderedItems) => [...prevOrderedItems, ...cart]);
-    clearCart();
+  const moveToOrderedItems = async () => {
+    try {
+      const newOrderedItems = cart.map((item) => ({
+        id: item.id.toString(),
+        name: item.name,
+        quantity: item.quantity.toString(),
+        price: item.current_price[0].NGN[0].toString(),
+        total: item.total.toString(),
+        image: item.photos[0].url,
+      }));
+
+      const payload = {
+        orderedItems: newOrderedItems.map((item) => JSON.stringify(item)),
+        orderDate: new Date().toISOString(),
+      };
+
+      console.log("Payload to be sent to Appwrite: ", payload); // Debugging line
+
+      const response = await databases.createDocument(
+        "6697fa22000e622ffd44", // Your database ID
+        "669aa8de002164e362ce", // Your collection ID
+        "unique()", // Use 'unique()' to generate a unique ID
+        payload
+      );
+      console.log("Ordered items saved to Appwrite: ", response);
+
+      setOrderedItems((prevOrderedItems) => [...prevOrderedItems, ...cart]);
+      clearCart();
+    } catch (error) {
+      console.error("Error saving ordered items to Appwrite: ", error);
+    }
+  };
+  const fetchOrderedItems = async () => {
+    try {
+      const response = await databases.listDocuments(
+        "6697fa22000e622ffd44", // Your database ID
+        "669aa8de002164e362ce" // Your collection ID
+      );
+
+      const fetchedOrderedItems = response.documents.map((doc) => ({
+        ...doc,
+        orderedItems: doc.orderedItems.map((item) => JSON.parse(item)),
+      }));
+
+      setOrderedItems(fetchedOrderedItems);
+      console.log("Fetched ordered items: ", fetchedOrderedItems);
+    } catch (error) {
+      console.error("Error fetching ordered items from Appwrite: ", error);
+    }
   };
 
   return (
@@ -158,6 +205,7 @@ export const AppProvider = ({ children }) => {
         moveToOrderedItems,
         selectedOrder,
         setSelectedOrder,
+        fetchOrderedItems,
       }}
     >
       {children}

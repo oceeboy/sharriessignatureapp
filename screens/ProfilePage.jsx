@@ -1,21 +1,15 @@
 import React, { useState } from "react";
-import {
-  Alert,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { account } from "../services/appwrite";
 import { useAuth } from "../context/AuthContext";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const ProfilePage = () => {
   const [isSubmitting, setSubmitting] = useState(false);
   const navigation = useNavigation();
 
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -29,8 +23,24 @@ const ProfilePage = () => {
     }
   };
 
+  const myOrders = () => {
+    navigation.navigate("historypage");
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerMainText}>Profile</Text>
+      </View>
+      <View style={styles.bodyContainer}>
+        <View style={styles.bodyContent}>
+          <Text style={styles.bodyText}>Name: {user.name}</Text>
+          <Text style={styles.bodyText}>Email: {user.email}</Text>
+          <TouchableOpacity onPress={myOrders}>
+            <Text style={styles.bodyText}>My Orders</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
       <View style={styles.container}>
         <Text style={styles.headerText}>Are you sure you want to log out?</Text>
         <TouchableOpacity
@@ -53,7 +63,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   container: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -74,6 +83,19 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontFamily: "Poppins-Medium",
   },
+  headerMainText: {
+    fontSize: 24,
+    fontFamily: "Poppins-Medium",
+  },
+  headerContainer: { marginTop: 32, alignItems: "center", marginBottom: 30 },
+  bodyText: {
+    fontSize: 16,
+    fontFamily: "Poppins-Medium",
+  },
+  bodyContainer: {
+    alignItems: "center",
+  },
+  bodyContent: {},
 });
 
 export default ProfilePage;

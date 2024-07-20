@@ -8,15 +8,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AppContext } from "../context/ProductContext";
-import { OrderDetail, Orderitem, ProductCard } from "../components";
-import { getImageUrl } from "../services/apiService";
+import Orderitem from "../components/Orderitem"; // Import the Orderitem component
 import { icons } from "../constants";
+import { OrderDetail } from "../components";
 
 const OrderHistoryPage = () => {
-  const { orderedItems, setSelectedOrder, selectedOrder } =
+  const { orderedItems, setSelectedOrder, fetchOrderedItems } =
     useContext(AppContext);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -25,11 +25,9 @@ const OrderHistoryPage = () => {
     setModalVisible(true);
   };
 
-  const uniqueOrderedItems = Array.from(
-    new Set(orderedItems.map((item) => item.unique_id))
-  ).map((id) => {
-    return orderedItems.find((item) => item.unique_id === id);
-  });
+  useEffect(() => {
+    fetchOrderedItems();
+  }, []);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -45,48 +43,50 @@ const OrderHistoryPage = () => {
         </Text>
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scrollArea}
-        showsVerticalScrollIndicator={false}
-      >
-        {uniqueOrderedItems.map((item) => (
-          <Orderitem
-            key={item.unique_id.toString()}
-            title={item.name}
-            price={item.current_price[0].NGN[0]}
-            image={getImageUrl(item.photos[0].url)}
-            onPress={() => handlePresentModal(item)}
-          />
-        ))}
-      </ScrollView>
-
-      <>
-        <Modal
-          animationType="slide"
-          visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(!modalVisible);
-          }}
-          presentationStyle="pageSheet"
+      {orderedItems.length === 0 ? (
+        <View style={styles.noItemsContainer}>
+          <Text style={styles.noItemsText}>No items found</Text>
+        </View>
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.scrollArea}
+          showsVerticalScrollIndicator={false}
         >
-          <View style={styles.modalHeader}>
-            <TouchableOpacity
-              style={styles.backIconContainer}
-              onPress={() => setModalVisible(!modalVisible)}
-            >
-              <Image
-                source={icons.backicon}
-                style={styles.backIcon}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-            <Text style={styles.modalHeaderText}>Order Details</Text>
-          </View>
-          <View style={styles.centeredView}>
-            <OrderDetail />
-          </View>
-        </Modal>
-      </>
+          {orderedItems.map((item) => (
+            <Orderitem
+              key={item.$id}
+              item={item}
+              onPress={() => handlePresentModal(item)}
+            />
+          ))}
+        </ScrollView>
+      )}
+
+      <Modal
+        animationType="slide"
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+        presentationStyle="pageSheet"
+      >
+        <View style={styles.modalHeader}>
+          <TouchableOpacity
+            style={styles.backIconContainer}
+            onPress={() => setModalVisible(!modalVisible)}
+          >
+            <Image
+              source={icons.backicon}
+              style={styles.backIcon}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+          <Text style={styles.modalHeaderText}>Order Details</Text>
+        </View>
+        <View style={styles.centeredView}>
+          <OrderDetail />
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -102,7 +102,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
-
   modalHeaderText: {
     fontSize: 16,
     fontFamily: "Poppins-SemiBold",
@@ -116,7 +115,6 @@ const styles = StyleSheet.create({
   backIconContainer: {
     width: 24,
     height: 24,
-
     backgroundColor: "#ffffff",
     justifyContent: "center",
     alignItems: "center",
@@ -129,5 +127,15 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     marginBottom: 150,
     alignItems: "center",
+  },
+  noItemsContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noItemsText: {
+    fontSize: 16,
+    fontFamily: "Poppins-Regular",
+    color: "#666",
   },
 });

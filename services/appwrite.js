@@ -8,4 +8,4 @@ client
 const account = new Account(client);
 const databases = new Databases(client);
 
-export { account, databases };
+export { account, databases, client };

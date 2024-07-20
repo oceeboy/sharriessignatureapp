@@ -2,12 +2,14 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Button,
+  Dimensions,
   FlatList,
   Image,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,7 +18,10 @@ import { getImageUrl, getProducts } from "../services/apiService";
 import ProductCard from "../components/ProductCard";
 import { AppContext } from "../context/ProductContext";
 import { useNavigation } from "@react-navigation/native";
+import { SkeletonLoader } from "../components";
+import { icons } from "../constants";
 
+const { width } = Dimensions.get("window");
 const SearchPage = () => {
   const { setSelectedProduct } = useContext(AppContext);
   const [products, setProducts] = useState([]);
@@ -62,22 +67,32 @@ const SearchPage = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          paddingHorizontal: 48,
-        }}
-      >
-        <TextInput
-          style={styles.input}
-          placeholder="Search for products..."
-          value={query}
-          onChangeText={setQuery}
-        />
-        <Button title="Search" onPress={handleSearch} />
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>Search</Text>
+        <View style={{ paddingHorizontal: 32 }}>
+          <View style={styles.searchInputContainer}>
+            <TouchableOpacity
+              style={styles.searchIconContainer}
+              onPress={handleSearch}
+            >
+              <Image
+                source={icons.searchicon}
+                style={styles.searchIcon}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+            <TextInput
+              style={styles.searchinput}
+              placeholder="Search for products...."
+              placeholderTextColor="#B1B2B2"
+              selectionColor="rgba(64, 140, 43, 1)"
+              value={query}
+              onChangeText={setQuery}
+            />
+          </View>
+        </View>
       </View>
-      {loading && <Text>Loading...</Text>}
+      {loading && <SkeletonLoader title={"map"} />}
       {error && <Text style={styles.errorText}>{error}</Text>}
       {!loading && !error && results.length === 0 && query && (
         <Text style={styles.noResultsText}>No products found</Text>
@@ -89,14 +104,14 @@ const SearchPage = () => {
       )}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingVertical: 40, paddingHorizontal: 32 }}
+        contentContainerStyle={{ paddingVertical: 10, paddingHorizontal: 20 }}
       >
         <View
           style={{
             flexDirection: "row",
             flexWrap: "wrap",
             justifyContent: "space-between",
-            gap: 10,
+            gap: 5,
           }}
         >
           {results.map((item) => (
@@ -120,13 +135,16 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingBottom: 48,
   },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 16,
-    paddingHorizontal: 8,
+  headerContainer: {
+    width: "100%",
+    alignItems: "center",
+    paddingVertical: 5,
   },
+  headerText: {
+    fontSize: 24,
+    fontFamily: "Poppins-Bold",
+  },
+
   itemContainer: {
     marginBottom: 16,
   },
@@ -146,6 +164,29 @@ const styles = StyleSheet.create({
     color: "gray",
     textAlign: "center",
     marginTop: 20,
+  },
+  searchInputContainer: {
+    width: "100%",
+    height: 40,
+    borderWidth: 1,
+    alignItems: "center",
+    flexDirection: "row",
+
+    borderRadius: 10,
+    borderColor: "#D2D3D3",
+    marginTop: 16,
+  },
+  searchIconContainer: {
+    width: 32,
+    height: 32,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  searchIcon: { width: 20, height: 20 },
+  searchinput: {
+    width: 286,
+    height: "100%",
+    paddingRight: 10,
   },
 });
 

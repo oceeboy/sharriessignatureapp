@@ -26,8 +26,9 @@ const PaymentPage = () => {
     navigation.goBack();
   };
 
-  const submit = () => {
-    moveToOrderedItems();
+  const submit = async () => {
+    await moveToOrderedItems();
+    // You can add other logic here, such as navigating to an order confirmation screen
     navigation.navigate("Ordersucces");
   };
 

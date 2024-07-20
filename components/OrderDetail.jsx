@@ -9,37 +9,39 @@ const OrderDetail = () => {
   const { selectedOrder } = useContext(AppContext);
 
   return (
-    <View style={styles.container}>
-      <View>
-        {selectedOrder.photos.map((photos) => (
-          <View style={styles.imageContainer} key={photos}>
-            <Image
-              source={{ uri: getImageUrl(photos.url) }}
-              style={{ height: "100%", width: "100%" }}
-              resizeMode="cover"
-            />
+    <>
+      {selectedOrder.orderedItems.map((orderedItems, index) => (
+        <View key={index} style={styles.container}>
+          <View>
+            <View style={styles.imageContainer}>
+              <Image
+                source={{ uri: getImageUrl(orderedItems.image) }}
+                style={{ height: "100%", width: "100%" }}
+                resizeMode="cover"
+              />
+            </View>
           </View>
-        ))}
-      </View>
-      <View style={styles.productDetailsContainer}>
-        <Text style={styles.productName}>{selectedOrder.name}</Text>
-        <Text style={styles.status}>Completed</Text>
-        <View style={styles.rowJus}>
-          <Text style={styles.textstyles}>Quantity:</Text>
-          <Text style={styles.textstyles}>{selectedOrder.quantity} pcs</Text>
+          <View style={styles.productDetailsContainer}>
+            <Text style={styles.productName}>{orderedItems.name}</Text>
+            <Text style={styles.status}>Completed</Text>
+            <View style={styles.rowJus}>
+              <Text style={styles.textstyles}>Quantity:</Text>
+              <Text style={styles.textstyles}>{orderedItems.quantity} pcs</Text>
+            </View>
+            <View style={styles.rowJus}>
+              <Text style={styles.textstyles}>Price:</Text>
+              <Text style={styles.textstyles}>
+                {formatCurrency(orderedItems.total)}
+              </Text>
+            </View>
+            <View style={styles.rowJus}>
+              <Text style={styles.textstyles}>Date:</Text>
+              <Text style={styles.textstyles}>{selectedOrder.orderDate}</Text>
+            </View>
+          </View>
         </View>
-        <View style={styles.rowJus}>
-          <Text style={styles.textstyles}>Price:</Text>
-          <Text style={styles.textstyles}>
-            {formatCurrency(selectedOrder.total)}
-          </Text>
-        </View>
-        <View style={styles.rowJus}>
-          <Text style={styles.textstyles}>Date:</Text>
-          <Text style={styles.textstyles}>19 July, 2024</Text>
-        </View>
-      </View>
-    </View>
+      ))}
+    </>
   );
 };
 
