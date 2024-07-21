@@ -11,12 +11,18 @@ import {
 import { ProductCard } from "../components";
 import { AppContext } from "../context/ProductContext";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 
 const WishListPage = () => {
   const { wishlist, removeFromWishlist } = useContext(AppContext);
 
   const handleRemoveFromWishlist = (productId) => {
     removeFromWishlist(productId);
+  };
+
+  const navigation = useNavigation();
+  const goHome = () => {
+    navigation.navigate("Home");
   };
 
   return (
@@ -27,6 +33,43 @@ const WishListPage = () => {
           contentContainerStyle={{ paddingHorizontal: 5 }}
           showsVerticalScrollIndicator={false}
         >
+          {wishlist.length === 0 && (
+            <View style={{ alignItems: "center" }}>
+              <View
+                style={{
+                  width: 150,
+                  height: 150,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ fontSize: 20, fontFamily: "Poppins-SemiBold" }}>
+                  Nothing here
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={{
+                  width: 200,
+                  height: 50,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 10,
+                  backgroundColor: "#408C2B",
+                }}
+                onPress={goHome}
+              >
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontFamily: "Poppins-SemiBold",
+                    color: "#fff",
+                  }}
+                >
+                  Discover Products
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
           <View style={styles.productGrid}>
             {wishlist.map((item) => (
               <ProductCard
@@ -52,12 +95,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   container: {
-    padding: 16,
+    paddingHorizontal: 20,
   },
   header: {
-    fontSize: 24,
+    fontSize: 18,
     fontFamily: "Poppins-SemiBold",
     marginBottom: 16,
+    marginTop: 20,
   },
   list: {
     flexGrow: 1,

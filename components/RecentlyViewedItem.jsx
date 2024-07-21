@@ -7,10 +7,12 @@ import ProductCard from "./ProductCard";
 import SkeletonLoader from "./SkeletonLoader";
 
 const RecentlyViewedItem = () => {
-  const { recentlyViewedItems } = useContext(AppContext);
+  const { recentlyViewedItems, addToCart, setSelectedProduct } =
+    useContext(AppContext);
   const navigation = useNavigation();
 
-  const handleProductSelect = () => {
+  const handleProductSelect = (product) => {
+    setSelectedProduct(product);
     navigation.navigate("Main");
   };
 
@@ -28,8 +30,9 @@ const RecentlyViewedItem = () => {
               image={getImageUrl(item.photos[0].url)}
               price={item.current_price[0].NGN[0]}
               title={item.name}
-              onPress={handleProductSelect}
+              onPress={() => handleProductSelect(item)}
               productId={item.unique_id}
+              onAdd={addToCart}
             />
           ))}
         </View>

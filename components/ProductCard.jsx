@@ -1,7 +1,8 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/ProductContext";
 import { icons } from "../constants";
+import { useNavigation } from "@react-navigation/native";
 
 function formatCurrency(value) {
   return new Intl.NumberFormat("en-US", {
@@ -10,13 +11,39 @@ function formatCurrency(value) {
   }).format(value);
 }
 
-const ProductCard = ({ title, price, image, onPress, productId, name }) => {
-  const { wishlist, addToWishlist, removeFromWishlist } =
-    useContext(AppContext);
+const ProductCard = ({
+  title,
+  price,
+  image,
+  onPress,
+  productId,
+  name,
+  onPressin,
+}) => {
+  const [quantity, setQuantity] = useState(1);
+  const {
+    selectedProduct,
+    wishlist,
+    addToWishlist,
+    removeFromWishlist,
+    addToCart,
+    setSelectedProduct,
+  } = useContext(AppContext);
   const isInWishlist = wishlist.some((item) => item.id === productId);
 
+  const addCart = () => {
+    onPress();
+  };
+
+  const navigation = useNavigation();
+
+  const nextPage = () => {
+    onPress();
+    navigation.navigate("ProductDetail");
+  };
+
   return (
-    <View style={styles.cardContainer}>
+    <TouchableOpacity style={styles.cardContainer} onPress={nextPage}>
       <View style={styles.imageContainer}>
         <Image
           source={{ uri: image }}
@@ -47,7 +74,7 @@ const ProductCard = ({ title, price, image, onPress, productId, name }) => {
         </View>
         <TouchableOpacity
           style={name === "wishlist" ? styles.buttonExtra : styles.button}
-          onPress={() => onPress()}
+          onPress={name === "wishlist" ? addCart : nextPage}
         >
           <Text
             style={
@@ -58,7 +85,7 @@ const ProductCard = ({ title, price, image, onPress, productId, name }) => {
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

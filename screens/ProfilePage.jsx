@@ -1,9 +1,17 @@
 import React, { useState } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useGlobalContext } from "../context/GlobalProvider";
 import { signOut } from "../lib/appwrite";
+import { icons } from "../constants";
 
 const ProfilePage = () => {
   const [isSubmitting, setSubmitting] = useState(false);
@@ -34,28 +42,78 @@ const ProfilePage = () => {
       <View style={styles.headerContainer}>
         <Text style={styles.headerMainText}>Profile</Text>
       </View>
-      <View style={styles.bodyContainer}>
-        <View style={styles.bodyContent}>
-          <Text style={styles.bodyText}>Name: {user ? user.name : "null"}</Text>
-          <Text style={styles.bodyText}>
-            Email: {user ? user.email : "null"}
-          </Text>
-          <TouchableOpacity onPress={myOrders}>
-            <Text style={styles.bodyText}>My Orders</Text>
-          </TouchableOpacity>
+      <View style={styles.imageContainer}>
+        <View style={styles.circleContainer}>
+          <Image
+            source={icons.username}
+            style={{ width: "100%", height: "100%" }}
+            resizeMode="contain"
+            tintColor={"#fff"}
+          />
         </View>
       </View>
-      <View style={styles.container}>
-        <Text style={styles.headerText}>Are you sure you want to log out?</Text>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleLogout}
-          disabled={isSubmitting}
-        >
-          <Text style={styles.buttonText}>
-            {isSubmitting ? "Logging out..." : "Log Out"}
-          </Text>
-        </TouchableOpacity>
+      <View style={styles.bodyContainer}>
+        <View style={styles.bodyContent}>
+          <View style={styles.orderButton}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+            >
+              <Image
+                source={icons.username}
+                style={{ width: 20, height: 20 }}
+                resizeMode="contain"
+                tintColor={"#ffffff"}
+              />
+              <Text style={styles.bodyText}>{user ? user.name : "null"}</Text>
+            </View>
+          </View>
+          <View style={styles.orderButton}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+            >
+              <Image
+                source={icons.emailicon}
+                style={{ width: 20, height: 20 }}
+                resizeMode="contain"
+                tintColor={"#ffffff"}
+              />
+              <Text style={styles.bodyText}>{user ? user.email : "null"}</Text>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.orderButton} onPress={myOrders}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+            >
+              <Image
+                source={icons.ordericon}
+                style={{ width: 20, height: 20 }}
+                resizeMode="contain"
+                tintColor={"#ffffff"}
+              />
+
+              <Text style={styles.orderText}>View Orders</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.orderButton}
+            onPress={handleLogout}
+            disabled={isSubmitting}
+          >
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+            >
+              <Image
+                source={icons.logout}
+                style={{ width: 20, height: 20 }}
+                resizeMode="contain"
+                tintColor={"#ffffff"}
+              />
+              <Text style={styles.orderText}>
+                {isSubmitting ? "Logging out..." : "Log Out"}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -66,40 +124,57 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  container: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
+
   headerText: {
     fontSize: 18,
     fontFamily: "Poppins-Regular",
     marginBottom: 20,
   },
-  button: {
-    backgroundColor: "#408C2B",
-    padding: 15,
-    borderRadius: 50,
-    alignItems: "center",
-    width: "80%",
-  },
-  buttonText: {
-    fontSize: 16,
-    color: "#fff",
-    fontFamily: "Poppins-Medium",
-  },
+
   headerMainText: {
-    fontSize: 24,
+    fontSize: 18,
     fontFamily: "Poppins-Medium",
   },
   headerContainer: { marginTop: 32, alignItems: "center", marginBottom: 30 },
   bodyText: {
-    fontSize: 16,
+    fontSize: 14,
+    color: "#ffffff",
     fontFamily: "Poppins-Medium",
+    lineHeight: 20,
   },
   bodyContainer: {
-    alignItems: "center",
+    paddingHorizontal: 20,
+    marginBottom: 40,
   },
-  bodyContent: {},
+  bodyContent: {
+    gap: 20,
+  },
+  circleContainer: {
+    width: 150,
+    height: 150,
+    borderRadius: 500,
+    borderWidth: 0.3,
+    backgroundColor: "#408C2B",
+    borderColor: "#408C2B",
+  },
+  imageContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  orderButton: {
+    width: "100%",
+    height: 50,
+    justifyContent: "center",
+    backgroundColor: "#408C2B",
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  orderText: {
+    fontSize: 14,
+    color: "#ffffff",
+    fontFamily: "Poppins-Medium",
+    lineHeight: 20,
+  },
 });
 
 export default ProfilePage;

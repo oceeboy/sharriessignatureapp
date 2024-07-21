@@ -2,6 +2,7 @@ import {
   FlatList,
   Image,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -13,14 +14,26 @@ import { AppContext } from "../context/ProductContext";
 import Orderitem from "../components/Orderitem";
 import { icons } from "../constants";
 import { OrderDetail } from "../components";
-import { fetchOrderedItems } from "../lib/appwrite"; // Adjust the import path as needed
-import { useGlobalContext } from "../context/GlobalProvider"; // Adjust the import path as needed
+import { fetchOrderedItems } from "../lib/appwrite";
+import { useGlobalContext } from "../context/GlobalProvider";
+import { CommonActions, useNavigation } from "@react-navigation/native";
 
 const OrderHistoryPage = () => {
   const { setSelectedOrder } = useContext(AppContext);
-  const { user } = useGlobalContext(); // Get the user from the global context
+  const { user } = useGlobalContext();
   const [orderedItems, setOrderedItems] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+
+  const navigation = useNavigation();
+
+  const goToProfile = () => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: "Main" }],
+      })
+    );
+  };
 
   const handlePresentModal = (product) => {
     setSelectedOrder(product);
@@ -31,18 +44,42 @@ const OrderHistoryPage = () => {
     const email = user.email;
 
     if (user) {
-      fetchOrderedItems(setOrderedItems, user, email); // Fetch ordered items based on the user
+      fetchOrderedItems(setOrderedItems, user, email);
     }
   }, [user]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={{ paddingVertical: 30 }}>
+      <View
+        style={{
+          paddingVertical: 30,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 20,
+        }}
+      >
+        <TouchableOpacity
+          style={{
+            width: 24,
+            height: 24,
+            backgroundColor: "#fff",
+            justifyContent: "center",
+            alignItems: "center",
+            marginLeft: 20,
+          }}
+          onPress={goToProfile}
+        >
+          <Image
+            source={icons.backicon}
+            style={{ width: 13, height: 13 }}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
         <Text
           style={{
             textAlign: "center",
             fontSize: 18,
-            fontFamily: "Poppins-Bold",
+            fontFamily: "Poppins-SemiBold",
           }}
         >
           My Order History
@@ -87,7 +124,12 @@ const OrderHistoryPage = () => {
           <Text style={styles.modalHeaderText}>Order Details</Text>
         </View>
         <View style={styles.centeredView}>
-          <OrderDetail />
+          <ScrollView
+            contentContainerStyle={{ paddingBottom: 100, marginBottom: 50 }}
+            showsVerticalScrollIndicator={false}
+          >
+            <OrderDetail />
+          </ScrollView>
         </View>
       </Modal>
     </SafeAreaView>

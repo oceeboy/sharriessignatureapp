@@ -9,7 +9,7 @@ import {
 import React, { useContext, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { icons } from "../constants";
-import { useNavigation } from "@react-navigation/native";
+import { CommonActions, useNavigation } from "@react-navigation/native";
 import { BankCard, CustomButton, FormField } from "../components";
 
 import { moveToOrderedItems } from "../lib/appwrite";
@@ -24,9 +24,10 @@ const PaymentPage = () => {
     cardcvv: "",
   });
 
+  const [errorMessage, setErrorMessage] = useState("");
   const { user } = useGlobalContext();
 
-  const { cart, setOrderedItems, clearCart } = useContext(AppContext); // Use the context
+  const { cart, setOrderedItems, clearCart } = useContext(AppContext);
 
   const format = (text) => text.replace(/(.{4})/g, "$1 ");
   const navigation = useNavigation();
@@ -35,14 +36,25 @@ const PaymentPage = () => {
   };
 
   const submit = async () => {
-    // Assuming `email` is available in context or passed from somewhere
-    const email = user.email; // You should replace this with actual user email
+    const { cardnumber, cardname, cardexpire, cardcvv } = form;
+
+    if (!cardnumber || !cardname || !cardexpire || !cardcvv) {
+      setErrorMessage("All card fields must be filled");
+      return;
+    }
+
+    const email = user.email;
 
     try {
       await moveToOrderedItems(cart, setOrderedItems, clearCart, email);
-      navigation.navigate("Ordersucces"); // Ensure route name is correct
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 7,
+          routes: [{ name: "Ordersucces" }],
+        })
+      );
     } catch (error) {
-      console.error("Error during order submission: ", error);
+      setErrorMessage("Error during order submission. Please try again.");
     }
   };
 
@@ -77,10 +89,14 @@ const PaymentPage = () => {
                 ? "●●●● ●●●● ●●●● ●●●●"
                 : format(form.cardnumber)
             }
-            cardname={form.cardname === "" ? "Osieta Gift" : form.cardname}
+            cardname={form.cardname === "" ? `${user.name}` : form.cardname}
             cardexpire={form.cardexpire === "" ? "02/30" : form.cardexpire}
           />
         </View>
+
+        {errorMessage ? (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        ) : null}
 
         <View style={styles.cardFormContainer}>
           <View style={styles.textFieldContainer}>
@@ -90,7 +106,7 @@ const PaymentPage = () => {
               value={form.cardname}
               handleChangeText={(e) => setForm({ ...form, cardname: e })}
               otherStyles={styles.cardname}
-              placeholder="Osieta Gift"
+              placeholder={user.name}
               borderradius={styles.borderradius}
             />
           </View>
@@ -167,6 +183,12 @@ const styles = StyleSheet.create({
   headerText: { fontSize: 16, fontFamily: "Poppins-SemiBold" },
 
   subContainer: { alignItems: "center", marginTop: 34 },
+
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 10,
+  },
 
   cardFormContainer: {
     alignItems: "center",

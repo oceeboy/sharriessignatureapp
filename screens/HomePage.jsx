@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
   RefreshControl,
+  Modal,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -22,15 +23,23 @@ import {
   CollectionCard,
   SkeletonLoader,
 } from "../components";
-
 import { useGlobalContext } from "../context/GlobalProvider";
+import { Snackbar, Provider as PaperProvider } from "react-native-paper";
 
 const HomePage = () => {
-  const { setSelectedProduct } = useContext(AppContext);
+  const { setSelectedProduct, addToCart } = useContext(AppContext);
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [cartName, setCartName] = useState("");
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+
+  const openModal = (name) => {
+    setModalVisible(true);
+    setCartName(name);
+  };
 
   const { user } = useGlobalContext();
 
@@ -52,17 +61,23 @@ const HomePage = () => {
       setError(null);
     } catch (error) {
       setError(error.message);
+      setSnackbarVisible(true);
       setRefreshing(false);
       setIsLoading(false);
     }
   };
 
+  useEffect(() => {}, []);
+
   const navigation = useNavigation();
 
   const nextPage = (product) => {
     setSelectedProduct(product);
+    // navigation.navigate("ProductDetail");
+  };
 
-    navigation.navigate("ProductDetail");
+  const orderPage = () => {
+    navigation.navigate("historypage");
   };
 
   const renderCategory = (categoryName) => {
@@ -84,6 +99,19 @@ const HomePage = () => {
         <View style={styles.sectionContentContainer}>
           {isLoading ? (
             <SkeletonLoader title={"map"} />
+          ) : error ? (
+            error && (
+              <View style={styles.errorContainer}>
+                <View style={styles.nonetworkContainer}>
+                  <Image
+                    source={icons.nonetwork}
+                    style={styles.nonetwork}
+                    resizeMode="contain"
+                  />
+                </View>
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            )
           ) : (
             <View style={styles.productGrid}>
               {filteredProducts.map((item) => (
@@ -96,11 +124,6 @@ const HomePage = () => {
                   productId={item.unique_id}
                 />
               ))}
-              {error && (
-                <View style={styles.errorContainer}>
-                  <Text style={styles.errorText}>{error}</Text>
-                </View>
-              )}
             </View>
           )}
         </View>
@@ -109,89 +132,160 @@ const HomePage = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.logoText}>Sharrie's Signature</Text>
-        <CartIcon />
-      </View>
-
-      <View style={styles.welcomeContainer}>
-        <Text style={styles.welcomeText}>
-          Welcome,
-          <Text style={{ textTransform: "capitalize" }}>{user?.name}</Text>
-        </Text>
-      </View>
-      <ScrollView
-        contentContainerStyle={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <View style={{ paddingHorizontal: 32 }}>
-          <View style={styles.searchInputContainer}>
-            <View style={styles.searchIconContainer}>
+    <PaperProvider>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.logoText}>Sharrie's Signature</Text>
+          <View style={{ flexDirection: "row", gap: 10 }}>
+            <TouchableOpacity
+              style={{
+                width: 28,
+                height: 28,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              onPress={orderPage}
+            >
               <Image
-                source={icons.searchicon}
-                style={styles.searchIcon}
-                resizeMode="contain"
+                source={icons.ordericon}
+                style={{ width: 20, height: 20 }}
+                resizeMode="cover"
               />
-            </View>
-            <TextInput
-              style={styles.searchinput}
-              placeholder="Search"
-              placeholderTextColor="#B1B2B2"
-              selectionColor="rgba(64, 140, 43, 1)"
-            />
+            </TouchableOpacity>
+            <CartIcon />
           </View>
         </View>
 
-        <View style={styles.sliderContainer}>
-          {isLoading ? (
-            <SkeletonLoader title={"slider"} />
-          ) : (
-            <SliderItems data={products} onPress={nextPage} />
-          )}
-          {error && (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
-          )}
+        <View style={styles.welcomeContainer}>
+          <Text style={styles.welcomeText}>
+            Welcome,
+            <Text style={{ textTransform: "capitalize" }}>{user?.name}</Text>
+          </Text>
         </View>
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionHeaderText}>Deals</Text>
-            <TouchableOpacity style={styles.viewAllButton}>
-              <Text style={styles.viewAllButtonText}>View All</Text>
+        <ScrollView
+          contentContainerStyle={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <View style={{ paddingHorizontal: 32 }}>
+            <TouchableOpacity
+              style={styles.searchInputContainer}
+              onPress={() => navigation.navigate("Search")}
+            >
+              <View
+                style={styles.searchIconContainer}
+                onMagicTap={() => navigation.navigate("Search")}
+              >
+                <Image
+                  source={icons.searchicon}
+                  style={styles.searchIcon}
+                  resizeMode="contain"
+                />
+              </View>
+              <Text style={styles.TextInput}>Search</Text>
             </TouchableOpacity>
           </View>
-          {renderCategory("Deals")}
-          <View style={styles.sectionHeader}>
-            <Text style={styles.collectionHeaderText}>Our Collections</Text>
-          </View>
-          <View style={styles.sectionContent}>
-            <View style={styles.sectionContentContainer}>
-              <View style={styles.productGrid}>
-                {collectionData.map((item) => (
-                  <CollectionCard
-                    key={item.id}
-                    title={item.name}
-                    image={item.image}
+
+          <View style={styles.sliderContainer}>
+            {isLoading ? (
+              <SkeletonLoader title={"slider"} />
+            ) : error ? (
+              <View style={styles.errorContainer}>
+                <View style={styles.nonetworkContainer}>
+                  <Image
+                    source={icons.wishuncheck}
+                    style={styles.nonetwork}
+                    resizeMode="contain"
                   />
-                ))}
+                </View>
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            ) : (
+              <SliderItems data={products} onPress={nextPage} />
+            )}
+          </View>
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionHeaderText}>Deals</Text>
+              <TouchableOpacity style={styles.viewAllButton}>
+                <Text style={styles.viewAllButtonText}>View All</Text>
+              </TouchableOpacity>
+            </View>
+            {renderCategory("Deals")}
+            <View style={styles.sectionHeader}>
+              <Text style={styles.collectionHeaderText}>Our Collections</Text>
+            </View>
+            <View style={styles.sectionContent}>
+              <View style={styles.sectionContentContainer}>
+                <View style={styles.productGrid}>
+                  {collectionData.map((item) => (
+                    <CollectionCard
+                      key={item.id}
+                      title={item.name}
+                      image={item.image}
+                      onPress={openModal}
+                    />
+                  ))}
+                </View>
               </View>
             </View>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionHeaderText}>You might like</Text>
+              <TouchableOpacity style={styles.viewAllButton}>
+                <Text style={styles.viewAllButtonText}>View All</Text>
+              </TouchableOpacity>
+            </View>
+            {renderCategory("mightlike")}
           </View>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionHeaderText}>You might like</Text>
-            <TouchableOpacity style={styles.viewAllButton}>
-              <Text style={styles.viewAllButtonText}>View All</Text>
-            </TouchableOpacity>
+        </ScrollView>
+        <Modal
+          animationType="slide"
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}
+          presentationStyle="pageSheet"
+        >
+          <View style={{ marginTop: 30 }}>
+            <View style={{ flexDirection: "row", gap: 20 }}>
+              <TouchableOpacity
+                style={{
+                  width: 24,
+                  height: 24,
+                  backgroundColor: "#fff",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginLeft: 20,
+                }}
+                onPress={() => setModalVisible(!modalVisible)}
+              >
+                <Image
+                  source={icons.backicon}
+                  style={{ width: 13, height: 13 }}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+              <Text style={{ fontFamily: "Poppins-Medium", fontSize: 16 }}>
+                {cartName}
+              </Text>
+            </View>
+            <ScrollView contentContainerStyle={{ paddingHorizontal: 20 }}>
+              {renderCategory(cartName)}
+            </ScrollView>
           </View>
-          {renderCategory("mightlike")}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </Modal>
+        <Snackbar
+          style={{ bottom: 100 }}
+          visible={snackbarVisible}
+          onDismiss={() => setSnackbarVisible(false)}
+          duration={Snackbar.DURATION_SHORT}
+        >
+          {error}
+        </Snackbar>
+      </SafeAreaView>
+    </PaperProvider>
   );
 };
 
@@ -238,7 +332,7 @@ const styles = StyleSheet.create({
   },
   searchInputContainer: {
     width: "100%",
-    height: 32,
+    height: 40,
     borderWidth: 1,
     alignItems: "center",
     flexDirection: "row",
@@ -291,7 +385,7 @@ const styles = StyleSheet.create({
   productGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-evenly",
+    justifyContent: "space-between",
     alignItems: "flex-start",
     gap: 5,
   },
@@ -300,5 +394,26 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Light",
     letterSpacing: 5,
     lineHeight: 19,
+  },
+  errorContainer: {
+    width: "100%",
+    alignItems: "center",
+    gap: 10,
+    paddingVertical: 20,
+  },
+  errorText: {
+    fontFamily: "Poppins-Medium",
+    fontSize: 14,
+    color: "red",
+  },
+  nonetworkContainer: {
+    width: 100,
+    height: 100,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  nonetwork: {
+    width: "100%",
+    height: "100%",
   },
 });

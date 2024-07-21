@@ -21,7 +21,9 @@ export const getProducts = async () => {
     const response = await apiClient.get(PRODUCTS_URL);
     return response.data.items;
   } catch (error) {
-    console.error(error);
+    throw new Error(
+      "Failed to fetch products. Please check your network connection."
+    );
   }
 };
 

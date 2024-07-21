@@ -21,6 +21,11 @@ import chip from "../assets/icons/chip.png";
 import success from "../assets/icons/success.png";
 import wishuncheck from "../assets/icons/wishuncheck.png";
 import wishchecked from "../assets/icons/wishchecked.png";
+import logout from "../assets/icons/logout.png";
+import ordericon from "../assets/icons/ordericon.png";
+import username from "../assets/icons/username.png";
+import emailicon from "../assets/icons/emailicon.png";
+import nonetwork from "../assets/icons/nonetwork.png";
 
 export default {
   home,
@@ -46,4 +51,9 @@ export default {
   success,
   wishuncheck,
   wishchecked,
+  logout,
+  ordericon,
+  username,
+  emailicon,
+  nonetwork,
 };

@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   buttonContainer: {
-    width: 400,
+    width: 300,
     height: 50,
     borderRadius: 50,
     justifyContent: "center",
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: "Poppins-SemiBold",
     color: "#fff",
     textAlign: "center",
@@ -111,28 +111,29 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   linkContainer: {
-    gap: 30,
+    gap: 10,
     marginTop: 30,
+    alignItems: "center",
   },
   bttnLink: {},
   rowText: {
-    fontSize: 20,
+    fontSize: 14,
     color: "#1F2029",
     fontFamily: "Poppins-Medium",
   },
   linkText: {
     color: "#408C2B",
     fontFamily: "Poppins-Medium",
-    fontSize: 20,
+    fontSize: 14,
   },
   welcomeText: {
-    fontSize: 30,
+    fontSize: 20,
     fontFamily: "Poppins-Bold",
     textAlign: "center",
     color: "#1F2029",
   },
   welcomeTextExtra: {
-    fontSize: 30,
+    fontSize: 20,
     fontFamily: "Poppins-Bold",
     textAlign: "center",
     color: "#408C2B",
@@ -147,7 +148,7 @@ const styles = StyleSheet.create({
   },
   welcomeMessage: {
     textAlign: "center",
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: "Poppins-Medium",
   },
   welcomeContainer: {

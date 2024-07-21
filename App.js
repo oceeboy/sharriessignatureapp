@@ -1,7 +1,7 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
+import { Provider as PaperProvider } from "react-native-paper";
 import TabIcon from "./components/TabIcon";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomePage from "./screens/HomePage";
@@ -17,7 +17,6 @@ import PaymentPage from "./screens/PaymentPage";
 import OrderSucess from "./screens/OrderSucess";
 import OrderHistoryPage from "./screens/OrderHistoryPage";
 
-import { Notifications } from "./components";
 import GlobalProvider from "./context/GlobalProvider";
 
 const Stack = createNativeStackNavigator();
@@ -152,12 +151,13 @@ export default function App() {
   return (
     <GlobalProvider>
       <FontProvider>
-        <AppProvider>
-          <NavigationContainer>
-            <MainNavigator />
-            <Notifications />
-          </NavigationContainer>
-        </AppProvider>
+        <PaperProvider>
+          <AppProvider>
+            <NavigationContainer>
+              <MainNavigator />
+            </NavigationContainer>
+          </AppProvider>
+        </PaperProvider>
       </FontProvider>
     </GlobalProvider>
   );

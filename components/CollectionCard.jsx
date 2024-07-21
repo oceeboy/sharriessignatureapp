@@ -1,14 +1,17 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 
-const CollectionCard = ({ image, title }) => {
+const CollectionCard = ({ image, title, onPress }) => {
   return (
-    <View style={styles.cardContainer}>
+    <TouchableOpacity
+      style={styles.cardContainer}
+      onLongPress={() => onPress(title)}
+    >
       <View style={styles.imageContainer}>
         <Image source={image} resizeMode="cover" style={styles.image} />
       </View>
       <Text style={styles.cardText}>{title}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
